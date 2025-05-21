@@ -1,3 +1,5 @@
+NGROK_CURRENT = 'https://96eb-2601-1c0-847f-af0-6c09-e6a5-aa13-f1c4.ngrok-free.app/receive';
+
 
 class Question {
     constructor(text) {
@@ -40,8 +42,8 @@ function searchForPrompts(timeout = 10000) {
     });
 }
 
-function queryAPI(question, choices){
-    let url = 'http://127.0.0.1:5000/receive';
+function queryAPI(question, choices, n){
+    let url = NGROK_CURRENT;
     let data = {
         question: question,
         choices: choices
@@ -61,7 +63,7 @@ function queryAPI(question, choices){
         return response.json();
     })
     .then(data => {
-        console.log('Response from API:', data);
+        console.log(`API Response ${n}:`, (data['answer'] ? data['answer'] : data['response']));
     })
     .catch(error => {
         console.error('Error querying API:', error);
@@ -75,8 +77,7 @@ async function main(){
         for (const el of elements) {
             n += 1;
             let q = new Question(el.innerText);
-            console.log(`QUESTION ${n}: ${q.question}`);
-            await queryAPI(q.question, q.options);
+            await queryAPI(q.question, q.options, n);
         }
     } catch (err) {
         console.error(err);
