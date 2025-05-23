@@ -26,7 +26,7 @@ if not check_port(11434):
 app = Flask(__name__)
 CORS(app)
 
-OLLAMA_URL = "http://localhost:11434/api/generate" #http://10.0.0.30:5000/api/endpoint
+OLLAMA_URL = "http://localhost:11434/api/generate" #http://localhost:11434/api/generate
 OLLAMA_MODEL = "gemma3" 
 
 prompt_direction = 'Respond in a JSON object format. Include two things in this object, a key called "answer" and a key called "confidence". The value of the "answer" key should be the answer to the question, and the value of the "confidence" key should be a decimal representing your confidence in the correctness of this answer. Approach creating the confidence key with objective neutrality and accuracy as the priority. Do not include any other text or formatting in your response. Do not include any other keys in your response. Do not include any other text in your response. Do not include any other formatting in your response.'

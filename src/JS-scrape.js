@@ -1,4 +1,5 @@
-NGROK_CURRENT = 'https://96eb-2601-1c0-847f-af0-6c09-e6a5-aa13-f1c4.ngrok-free.app/receive';
+const NGROK_CURRENT = 'https://96eb-2601-1c0-847f-af0-6c09-e6a5-aa13-f1c4.ngrok-free.app/receive';
+const LOCALHOST = "http://localhost:5000/receive"
 
 
 class Question {
@@ -43,7 +44,7 @@ function searchForPrompts(timeout = 10000) {
 }
 
 function queryAPI(question, choices, n){
-    let url = NGROK_CURRENT;
+    let url = LOCALHOST;
     let data = {
         question: question,
         choices: choices
