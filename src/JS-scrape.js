@@ -16,6 +16,13 @@ class Question {
     }
 }
 
+class SelectionPackage{
+    constructor(id, content){
+        this.content = content;
+        this.id = id;
+    }
+}
+
 
 function searchForPrompts(timeout = 10000) {
     return new Promise((resolve, reject) => {
@@ -71,14 +78,59 @@ function queryAPI(question, choices, n){
     });
 }
 
+async function dynamicSelection(id, answer){
+    //concat the idNum and answerName to create the id
+    //check if in document
+    //id = question_564_answer_51
+    //class = .question_input
+    let ans = document.getElementById(id);
+    if (ans.startswith(id)){
+        return ans;
+    }
+}
+
+function getQuestionId(div) {
+    let allDivs = div.querySelectorAll("div");
+    for (let childDiv of allDivs) {
+        if (childDiv.id) {
+            questionId = childDiv.id.match(/question_(\d+)_question_text/);
+            return questionId[0]; 
+        }
+    }
+}
+
+function getRadio(div){
+    let divPackages = [];
+    let unpackaged = []
+    let radios = div.querySelectorAll('input[type="radio"]');
+    let labels = div.querySelectorAll('.answer_label');
+    let n = 0;
+
+    for (let div of radios) {
+        let id = div.id;
+        let label = labels[n].innerText
+        divPackages.push(new SelectionPackage(id, label));
+        n+= 1;
+    }
+    return divPackages;
+    //return (`RADIOS: ${radios.length} LABELS: ${labels.length}`);
+}
+
+
+
 async function main(){
     try{
         const elements = await searchForPrompts(10000);
         let n = 0;
         for (const el of elements) {
             n += 1;
+            /*
             let q = new Question(el.innerText);
-            await queryAPI(q.question, q.options, n);
+            await queryAPI(q.question, q.options, n);*/
+            let packages = getRadio(el);
+            for (const pkg of packages) { // Iterate over the array
+                console.log(`divTEXTID ${n}: ID: ${pkg.id}  TEXT: ${pkg.content}`);
+            }
         }
     } catch (err) {
         console.error(err);
