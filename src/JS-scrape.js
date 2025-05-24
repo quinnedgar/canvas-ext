@@ -50,25 +50,25 @@ function searchForPrompts(timeout = 10000) {
     });
 }
 
-function queryAPI(question, choices, n){
+async function queryAPIOld(question, choices, n){
     let url = LOCALHOST;
     let data = {
         question: question,
         choices: choices
     };
 
-    fetch(url, {
+    const response = fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
+    .then(async response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        return response.json();
+        return await response.json();
     })
     .then(data => {
         console.log(`API Response ${n}:`, (data['answer'] ? data['answer'] : data['response']));
@@ -78,16 +78,40 @@ function queryAPI(question, choices, n){
     });
 }
 
-async function dynamicSelection(id, answer){
-    //concat the idNum and answerName to create the id
-    //check if in document
-    //id = question_564_answer_51
-    //class = .question_input
-    let ans = document.getElementById(id);
-    if (ans.startswith(id)){
-        return ans;
+
+async function queryAPI(question, choices, n) {
+    let url = LOCALHOST;
+    let data = {
+        question: question,
+        choices: choices
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const jsonData = await response.json();
+        if (jsonData['answer']) {
+            return jsonData['answer'];
+        } else {
+            console.log(`ERR Response ${n}:`, jsonData['response']);
+            return null; 
+        }
+    } catch (error) {
+        console.error('Error querying API:', error);
+        return null; // Return null in case of an error
     }
 }
+
 
 function getQuestionId(div) {
     let allDivs = div.querySelectorAll("div");
@@ -116,6 +140,10 @@ function getRadio(div){
     //return (`RADIOS: ${radios.length} LABELS: ${labels.length}`);
 }
 
+async function compare(answers, response){
+
+}
+
 
 
 async function main(){
@@ -124,12 +152,29 @@ async function main(){
         let n = 0;
         for (const el of elements) {
             n += 1;
-            /*
             let q = new Question(el.innerText);
-            await queryAPI(q.question, q.options, n);*/
+            data = await queryAPI(q.question, q.options, n);
+            if (data) {
+                console.log(`API Response ${n}: ${data}`);
+            } else {
+                console.error(`No valid answer received for question ${n}`);
+                continue; // Skip to the next iteration if no valid data is received
+            }
             let packages = getRadio(el);
-            for (const pkg of packages) { // Iterate over the array
-                console.log(`divTEXTID ${n}: ID: ${pkg.id}  TEXT: ${pkg.content}`);
+            for (const pkg of packages) {
+                if (data == pkg.content){
+                    console.log(`Selected: [${pkg.content}] with ID: ${pkg.id}`);
+                } else {
+                    if (n==9 || pkg.content.length == 40){
+
+                        //FOR LATER: This issue occurs because pkg.content contains the unicode invisible chars 173 and 32, remnant of when they were sanitized in the API
+                        console.log(`DATA: [${data.length}], PKG: [${pkg.content.length}]`);
+                        for (let i = 0; i < Math.max(data.length, pkg.content.length); i++) {
+                            console.log(`Index ${i} DATA = ${data.charAt(i)}: (${data.charCodeAt(i)}) | PKG CONTENT = ${pkg.content.charAt(i)} (${pkg.content.charCodeAt(i)})`);
+                        }
+                    }
+
+                }
             }
         }
     } catch (err) {

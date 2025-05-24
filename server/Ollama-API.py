@@ -94,13 +94,13 @@ def receive():
     print(f"Sanitized Model Result: {model_result}")
     print("-------------------------------------------------------------------\n")
 
-    for c in choices:
+    '''for c in choices:
         if is_subsequence(c, model_result):
-            #print(f"--> Found: {c}\n")
-            return jsonify({"answer": c})
+            print(f"--> Found: {c}\n")
+            return model_result'''
      
-    #print(f"--> Unfound: {model_result}\n")
-    return jsonify({"response": model_result})
+    return model_result
+    r#eturn jsonify({"response": model_result})
 
     
 @app.route('/shutdown', methods=['POST'])
